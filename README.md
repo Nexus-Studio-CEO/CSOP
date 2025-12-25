@@ -10,7 +10,7 @@
 
 ## 🌟 Qu'est-ce que CSOP ?
 
-CSOP (Client-Side Orchestration Protocol) est un protocole révolutionnaire qui transforme le navigateur en orchestrateur intelligent capable de gérer :
+CSOP (Client-Side Orchestration Protocol) est un protocole qui transforme le navigateur en orchestrateur intelligent capable de gérer :
 
 - **Storage** : Données locales (IndexedDB) et cloud (Turso)
 - **Compute** : Calculs lourds parallélisés (Web Workers)
@@ -260,19 +260,19 @@ CSOP Core (csop.js)
 
 ## 🗺️ Roadmap
 
-### v0.2.0 (Q2 2025)
+### v0.2.0 (Q2 2026)
 - ✅ Streaming pour gros fichiers
 - ✅ TypeScript definitions
 - ✅ Cache intelligent
 - ✅ Metrics/Logging
 
-### v0.3.0 (Q3 2025)
+### v0.3.0 (Q3 2026)
 - ✅ Conflict resolution (CRDT)
 - ✅ Multi-leader sync
 - ✅ Progressive Web App support
 - ✅ Developer Tools (debugger)
 
-### v1.0.0 (Q4 2025)
+### v1.0.0 (Q4 2026)
 - ✅ Production-ready
 - ✅ Enterprise features
 - ✅ Security audit
