@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSOP v0.1.0 - Advanced Examples</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    
+    <div class="max-w-6xl mx-auto">
+        
+        <header class="mb-8 border-b border-gray-700 pb-6">
+            <h1 class="text-4xl font-bold text-blue-400">CSOP v0.1.0 - Advanced Use Cases</h1>
+            <p class="text-gray-400 mt-2">Real-world scenarios and advanced patterns</p>
+        </header>
+
+        <!-- Use Case 1: CSV Processing -->
+        <section class="mb-12 bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4 text-purple-400">📊 Use Case 1: Process Large CSV (Batch Computing)</h2>
+            <p class="text-gray-300 mb-4">Parse and process CSV data in parallel using multiple workers</p>
+            
+            <textarea id="csv-input" placeholder="Paste CSV data here..." 
+                class="w-full h-32 bg-gray-700 border border-gray-600 rounded p-3 text-white font-mono text-sm mb-4"></textarea>
+            
+            <button onclick="processCSV()" 
+                class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold">
+                Process CSV in Parallel
+            </button>
+
+            <div id="csv-output" class="mt-4 p-4 bg-gray-900 rounded font-mono text-sm text-green-400 min-h-[100px]"></div>
+
+            <details class="mt-4">
+                <summary class="cursor-pointer text-blue-400 hover:text-blue-300">Show Implementation Code</summary>
+                <pre class="bg-gray-950 p-4 rounded mt-2 text-sm overflow-x-auto"><code>// Split CSV into chunks and process in parallel
+const rows = csvData.split('\\n');
+const chunkSize = Math.ceil(rows.length / numWorkers);
+
+const tasks = [];
+for (let i = 0; i < numWorkers; i++) {
+    const chunk = rows.slice(i * chunkSize, (i + 1) * chunkSize);
+    tasks.push({
+        task: 'custom',
+        data: {
+            fn: 'return data.chunk.length',
+            args: { chunk }
+        }
+    });
+}
+
+const result = await csop.dispatch('compute.batch', { tasks });</code></pre>
+            </details>
+        </section>
+
+        <!-- Use Case 2: Persistent Cache with Fallback -->
+        <section class="mb-12 bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400">⚡ Use Case 2: Smart Cache System</h2>
+            <p class="text-gray-300 mb-4">Auto-retry with fallback and intelligent caching</p>
+            
+            <div class="flex gap-4 mb-4">
+                <input type="text" id="cache-key" placeholder="API endpoint (e.g., /users/123)" 
+                    class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                <button onclick="fetchWithCache()" 
+                    class="bg-yellow-600 hover:bg-yellow-500 px-6 py-2 rounded font-bold">
+                    Fetch with Cache
+                </button>
+            </div>
+
+            <div id="cache-output" class="p-4 bg-gray-900 rounded font-mono text-sm text-yellow-400 min-h-[100px]"></div>
+
+            <details class="mt-4">
+                <summary class="cursor-pointer text-yellow-400 hover:text-yellow-300">Show Implementation Code</summary>
+                <pre class="bg-gray-950 p-4 rounded mt-2 text-sm overflow-x-auto"><code>async function fetchWithCache(endpoint) {
+    // Try cache first
+    try {
+        const cached = await csop.dispatch('storage.get', { 
+            key: `cache:${endpoint}` 
+        });
+        
+        if (cached.data && Date.now() - cached.data.timestamp < 60000) {
+            return cached.data.response; // Cache valid for 1 min
+        }
+    } catch (e) {
+        console.log('Cache miss');
+    }
+
+    // Fetch with retry
+    const response = await csop.dispatch('network.fetch', {
+        url: endpoint
+    }, {
+        retry: 3,
+        timeout: 10000
+    });
+
+    // Save to cache
+    await csop.dispatch('storage.save', {
+        key: `cache:${endpoint}`,
+        data: { response, timestamp: Date.now() }
+    });
+
+    return response;
+}</code></pre>
+            </details>
+        </section>
+
+        <!-- Use Case 3: Collaborative Editor -->
+        <section class="mb-12 bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4 text-green-400">✍️ Use Case 3: Real-time Collaborative Editor</h2>
+            <p class="text-gray-300 mb-4">Multi-user text editor with live sync (Open in 2+ tabs)</p>
+            
+            <textarea id="collab-editor" placeholder="Start typing..." 
+                class="w-full h-40 bg-gray-700 border border-gray-600 rounded p-3 text-white font-mono text-sm mb-4"></textarea>
+            
+            <button onclick="startCollaboration()" 
+                class="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold">
+                Start Collaboration
+            </button>
+
+            <div class="mt-4 flex gap-4">
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold mb-2">Online Users</h3>
+                    <div id="users-online" class="p-3 bg-gray-900 rounded text-sm text-green-400 min-h-[60px]">
+                        Not connected
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold mb-2">Activity Log</h3>
+                    <div id="activity-log" class="p-3 bg-gray-900 rounded text-sm text-blue-400 min-h-[60px] max-h-[100px] overflow-y-auto">
+                        No activity yet
+                    </div>
+                </div>
+            </div>
+
+            <details class="mt-4">
+                <summary class="cursor-pointer text-green-400 hover:text-green-300">Show Implementation Code</summary>
+                <pre class="bg-gray-950 p-4 rounded mt-2 text-sm overflow-x-auto"><code>// Subscribe to changes
+await csop.dispatch('sync.subscribe', {
+    channel: 'editor',
+    callback: (msg) => {
+        if (msg.event === 'text_change') {
+            document.getElementById('editor').value = msg.data.text;
+        }
+    }
+});
+
+// Broadcast changes (debounced)
+editor.addEventListener('input', debounce(async (e) => {
+    await csop.dispatch('sync.broadcast', {
+        event: 'text_change',
+        data: { text: e.target.value, userId: myId }
+    });
+}, 300));
+
+// Track presence
+await csop.dispatch('sync.presence', {
+    channel: 'editor',
+    userId: myId,
+    metadata: { name: 'User ' + myId }
+});</code></pre>
+            </details>
+        </section>
+
+        <!-- Use Case 4: Progressive Data Loading -->
+        <section class="mb-12 bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4 text-red-400">📈 Use Case 4: Progressive Data Loading</h2>
+            <p class="text-gray-300 mb-4">Load large datasets incrementally with progress tracking</p>
+            
+            <button onclick="loadLargeDataset()" 
+                class="bg-red-600 hover:bg-red-500 px-6 py-2 rounded font-bold">
+                Load 1000 Records
+            </button>
+
+            <div class="mt-4">
+                <div class="flex justify-between text-sm mb-2">
+                    <span>Progress</span>
+                    <span id="progress-text">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div id="progress-bar" class="bg-red-600 h-3 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="dataset-output" class="mt-4 p-4 bg-gray-900 rounded font-mono text-sm text-red-400 max-h-[200px] overflow-y-auto"></div>
+        </section>
+
+        <!-- Use Case 5: Offline-First App -->
+        <section class="mb-12 bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-400">📴 Use Case 5: Offline-First Todo App</h2>
+            <p class="text-gray-300 mb-4">Works offline, syncs when back online</p>
+            
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="todo-input" placeholder="New todo..." 
+                    class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-white">
+                <button onclick="addTodo()" 
+                    class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2 rounded font-bold">
+                    Add
+                </button>
+            </div>
+
+            <div id="todo-list" class="space-y-2 mb-4"></div>
+
+            <div class="flex gap-4 text-sm">
+                <div class="px-3 py-1 rounded bg-gray-700">
+                    Online: <span id="online-status" class="font-bold">✅</span>
+                </div>
+                <div class="px-3 py-1 rounded bg-gray-700">
+                    Pending Sync: <span id="pending-sync" class="font-bold">0</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- CSOP Integration -->
+    <script type="module">
+        import { CSOP } from 'https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.1.0/src/csop.js';
+        
+        window.csop = new CSOP();
+        await window.csop.init();
+        console.log('✅ CSOP Advanced Examples Ready');
+
+        // === Use Case 1: CSV Processing ===
+        window.processCSV = async function() {
+            const input = document.getElementById('csv-input').value;
+            const output = document.getElementById('csv-output');
+            
+            if (!input) {
+                const sampleCSV = 'id,name,value\n1,Alice,100\n2,Bob,200\n3,Charlie,300\n4,David,400\n5,Eve,500';
+                document.getElementById('csv-input').value = sampleCSV;
+                output.textContent = '📝 Sample CSV loaded. Click "Process" again.';
+                return;
+            }
+
+            output.textContent = '⚙️ Processing...';
+            
+            const rows = input.split('\n').filter(r => r.trim());
+            const tasks = rows.slice(1).map((row, i) => ({
+                task: 'custom',
+                data: {
+                    fn: `
+                        const [id, name, value] = data.row.split(',');
+                        return { id, name, value: parseInt(value) || 0 };
+                    `,
+                    args: { row }
+                }
+            }));
+
+            const start = performance.now();
+            const result = await window.csop.dispatch('compute.batch', { tasks });
+            const duration = (performance.now() - start).toFixed(2);
+
+            output.textContent = `✅ Processed ${result.data.total} rows in ${duration}ms\n\n` +
+                `Completed: ${result.data.completed}\n` +
+                `Failed: ${result.data.failed}\n\n` +
+                `Sample results:\n${JSON.stringify(result.data.results.slice(0, 3), null, 2)}`;
+        };
+
+        // === Use Case 2: Smart Cache ===
+        window.fetchWithCache = async function() {
+            const endpoint = document.getElementById('cache-key').value || '/api/test';
+            const output = document.getElementById('cache-output');
+            
+            output.textContent = `🔍 Checking cache for: ${endpoint}...`;
+
+            try {
+                const cached = await window.csop.dispatch('storage.get', { 
+                    key: `cache:${endpoint}` 
+                });
+
+                const age = Date.now() - cached.data.timestamp;
+                if (age < 60000) {
+                    output.textContent = `✅ Cache HIT!\n\nEndpoint: ${endpoint}\nAge: ${(age/1000).toFixed(1)}s\nData: ${JSON.stringify(cached.data.response)}`;
+                    return;
+                }
+            } catch (e) {
+                output.textContent += '\n⚠️ Cache MISS. Simulating fetch...';
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+
+            const mockData = { status: 'ok', data: `Response for ${endpoint}`, timestamp: Date.now() };
+            
+            await window.csop.dispatch('storage.save', {
+                key: `cache:${endpoint}`,
+                data: { response: mockData, timestamp: Date.now() }
+            });
+
+            output.textContent = `✅ Data fetched and cached!\n\nEndpoint: ${endpoint}\nResponse: ${JSON.stringify(mockData)}`;
+        };
+
+        // === Use Case 3: Collaborative Editor ===
+        let collabActive = false;
+        
+        window.startCollaboration = async function() {
+            if (collabActive) return;
+            
+            const editor = document.getElementById('collab-editor');
+            const usersDiv = document.getElementById('users-online');
+            const logDiv = document.getElementById('activity-log');
+
+            const userId = 'user_' + Math.random().toString(36).substr(2, 6);
+
+            await window.csop.dispatch('sync.subscribe', {
+                channel: 'editor',
+                callback: (msg) => {
+                    if (msg.event === 'text_change' && msg.data.userId !== userId) {
+                        editor.value = msg.data.text;
+                        logDiv.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg.data.userId} edited</div>` + logDiv.innerHTML;
+                    }
+                }
+            });
+
+            let timeout;
+            editor.addEventListener('input', (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(async () => {
+                    await window.csop.dispatch('sync.broadcast', {
+                        event: 'text_change',
+                        data: { text: e.target.value, userId }
+                    });
+                }, 300);
+            });
+
+            const presence = await window.csop.dispatch('sync.presence', {
+                channel: 'editor',
+                userId,
+                metadata: { name: userId }
+            });
+
+            usersDiv.textContent = `${presence.data.online} user(s) online:\n` + 
+                presence.data.users.map(u => `• ${u.userId}`).join('\n');
+
+            collabActive = true;
+            logDiv.textContent = `✅ Connected as ${userId}`;
+        };
+
+        // === Use Case 4: Progressive Loading ===
+        window.loadLargeDataset = async function() {
+            const output = document.getElementById('dataset-output');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            output.innerHTML = '';
+            const total = 1000;
+            const batchSize = 100;
+
+            for (let i = 0; i < total; i += batchSize) {
+                const batch = Array.from({ length: batchSize }, (_, j) => ({
+                    id: i + j + 1,
+                    data: `Record ${i + j + 1}`
+                }));
+
+                await window.csop.dispatch('storage.save', {
+                    key: `batch_${i}`,
+                    data: batch
+                });
+
+                const progress = ((i + batchSize) / total * 100).toFixed(0);
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+
+                output.innerHTML += `<div>✅ Batch ${i/batchSize + 1}: Loaded ${batchSize} records</div>`;
+                output.scrollTop = output.scrollHeight;
+
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            output.innerHTML += `<div class="text-green-400 font-bold mt-2">🎉 All 1000 records loaded!</div>`;
+        };
+
+        // === Use Case 5: Offline Todo ===
+        let todos = [];
+        
+        window.addTodo = async function() {
+            const input = document.getElementById('todo-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const todo = { id: Date.now(), text, done: false };
+            todos.push(todo);
+            
+            await window.csop.dispatch('storage.save', {
+                key: 'todos',
+                data: todos
+            });
+
+            renderTodos();
+            input.value = '';
+        };
+
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = todos.map(t => `
+                <div class="flex items-center gap-2 p-2 bg-gray-700 rounded">
+                    <input type="checkbox" ${t.done ? 'checked' : ''}>
+                    <span class="${t.done ? 'line-through text-gray-500' : ''}">${t.text}</span>
+                </div>
+            `).join('');
+        }
+
+        window.addEventListener('online', () => {
+            document.getElementById('online-status').textContent = '✅';
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('online-status').textContent = '❌';
+        });
+
+        try {
+            const saved = await window.csop.dispatch('storage.get', { key: 'todos' });
+            todos = saved.data;
+            renderTodos();
+        } catch (e) {}
+    </script>
+
+    <footer class="mt-12 pt-6 border-t border-gray-700 text-center text-gray-500">
+        <p>CSOP v0.1.0 - Advanced Examples</p>
+        <p class="mt-2">Created by <strong>DAOUDA Abdoul Anzize</strong> - CEO, Nexus Studio</p>
+        <p class="mt-1 text-sm">
+            <a href="https://github.com/Nexus-Studio-CEO/csop" class="text-blue-400 hover:text-blue-300">GitHub</a> | 
+            <a href="mailto:nexusstudio100@gmail.com" class="text-blue-400 hover:text-blue-300">Contact</a>
+        </p>
+    </footer>
+
+</body>
+</html>
