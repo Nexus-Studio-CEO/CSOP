@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSOP v0.1.0 - Basic Usage Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        h1 { color: #60a5fa; }
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        .output {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            color: #4ade80;
+            min-height: 60px;
+        }
+        .code {
+            background: #1e293b;
+            border-left: 3px solid #60a5fa;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        pre {
+            margin: 0;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>🚀 CSOP v0.1.0 - Basic Usage</h1>
+    <p style="color: #94a3b8;">Simple examples to get started with Client-Side Orchestration Protocol</p>
+
+    <!-- Example 1: Storage -->
+    <div class="card">
+        <h2>💾 Example 1: Save & Retrieve Data</h2>
+        <p>Store data locally in the browser (IndexedDB)</p>
+        
+        <div class="code">
+            <pre>const result = await csop.dispatch('storage.save', {
+    key: 'my-data',
+    data: { message: 'Hello CSOP!' }
+});</pre>
+        </div>
+
+        <button onclick="saveData()">Save Data</button>
+        <button onclick="getData()">Get Data</button>
+        
+        <div id="storage-output" class="output">Click a button to test storage...</div>
+    </div>
+
+    <!-- Example 2: Compute -->
+    <div class="card">
+        <h2>⚡ Example 2: Heavy Computation</h2>
+        <p>Calculate Fibonacci in parallel using Web Workers</p>
+        
+        <div class="code">
+            <pre>const result = await csop.dispatch('compute.execute', {
+    task: 'fibonacci',
+    data: { n: 100 }
+});</pre>
+        </div>
+
+        <button onclick="computeFibonacci()">Calculate Fibonacci(100)</button>
+        
+        <div id="compute-output" class="output">Click to run computation...</div>
+    </div>
+
+    <!-- Example 3: Sync -->
+    <div class="card">
+        <h2>🔄 Example 3: Real-time Sync</h2>
+        <p>Broadcast messages across tabs (open this page in 2+ tabs)</p>
+        
+        <div class="code">
+            <pre>await csop.dispatch('sync.broadcast', {
+    event: 'message',
+    data: { text: 'Hello from tab!' }
+});</pre>
+        </div>
+
+        <button onclick="sendMessage()">Send Message</button>
+        <button onclick="subscribeMessages()">Subscribe</button>
+        
+        <div id="sync-output" class="output">No messages yet...</div>
+    </div>
+
+    <!-- CSOP Integration -->
+    <script type="module">
+        // Import CSOP from CDN
+        import { CSOP } from 'https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.1.0/src/csop.js';
+        
+        // Initialize
+        window.csop = new CSOP();
+        await window.csop.init();
+        
+        console.log('✅ CSOP Ready!');
+
+        // === Example 1: Storage ===
+        
+        window.saveData = async function() {
+            const output = document.getElementById('storage-output');
+            output.textContent = 'Saving...';
+            
+            try {
+                const result = await window.csop.dispatch('storage.save', {
+                    key: 'my-data',
+                    data: { 
+                        message: 'Hello CSOP!',
+                        timestamp: Date.now(),
+                        from: 'Nexus Studio'
+                    }
+                });
+                
+                output.textContent = `✅ Saved successfully!\nLocation: ${result.data.location}\nSize: ${result.data.size} bytes`;
+                
+            } catch (error) {
+                output.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        window.getData = async function() {
+            const output = document.getElementById('storage-output');
+            output.textContent = 'Loading...';
+            
+            try {
+                const result = await window.csop.dispatch('storage.get', {
+                    key: 'my-data'
+                });
+                
+                output.textContent = `✅ Retrieved:\n${JSON.stringify(result.data, null, 2)}`;
+                
+            } catch (error) {
+                output.textContent = `❌ Error: ${error.message}\n\n(Tip: Click "Save Data" first)`;
+            }
+        }
+
+        // === Example 2: Compute ===
+        
+        window.computeFibonacci = async function() {
+            const output = document.getElementById('compute-output');
+            output.textContent = 'Computing...';
+            
+            const start = performance.now();
+            
+            try {
+                const result = await window.csop.dispatch('compute.execute', {
+                    task: 'fibonacci',
+                    data: { n: 100 }
+                });
+                
+                const duration = (performance.now() - start).toFixed(2);
+                
+                output.textContent = `✅ Fibonacci(100) = ${result.data}\n\nComputed in ${duration}ms using Web Workers`;
+                
+            } catch (error) {
+                output.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // === Example 3: Sync ===
+        
+        let subscribed = false;
+
+        window.sendMessage = async function() {
+            const output = document.getElementById('sync-output');
+            
+            try {
+                await window.csop.dispatch('sync.broadcast', {
+                    event: 'message',
+                    data: { 
+                        text: 'Hello from tab!',
+                        time: new Date().toLocaleTimeString()
+                    }
+                });
+                
+                output.textContent = '✅ Message sent! (Open in another tab to see it)';
+                
+            } catch (error) {
+                output.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        window.subscribeMessages = async function() {
+            if (subscribed) {
+                alert('Already subscribed!');
+                return;
+            }
+
+            const output = document.getElementById('sync-output');
+            
+            try {
+                await window.csop.dispatch('sync.subscribe', {
+                    channel: 'default',
+                    callback: (msg) => {
+                        output.textContent = `📨 Received message:\n${msg.data.text}\nAt: ${msg.data.time}`;
+                    }
+                });
+                
+                subscribed = true;
+                output.textContent = '✅ Subscribed! Send a message from another tab.';
+                
+            } catch (error) {
+                output.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; text-align: center; color: #64748b;">
+        <p>CSOP v0.1.0 - Created by <strong>DAOUDA Abdoul Anzize</strong></p>
+        <p><a href="https://github.com/Nexus-Studio-CEO/csop" style="color: #60a5fa;">GitHub</a> | 
+           <a href="mailto:nexusstudio100@gmail.com" style="color: #60a5fa;">Contact</a></p>
+        <p style="font-size: 14px; margin-top: 10px;">© 2024 Nexus Studio - MIT License</p>
+    </footer>
+
+</body>
+</html>
