@@ -1,6 +1,6 @@
 # 🎯 CSOP - Client-Side Orchestration Protocol
 
-**Version:** v0.1.0  
+**Version:** v0.2.0  
 **Status:** Alpha - Early Preview  
 **License:** MIT  
 **Author:** DAOUDA Abdoul Anzize - CEO, Nexus Studio  
@@ -29,7 +29,7 @@ CSOP (Client-Side Orchestration Protocol) est un protocole qui transforme le nav
 <html>
 <head>
     <script type="module">
-        import { CSOP } from 'https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.1.0/src/csop.js';
+        import { CSOP } from 'https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.2.0/src/csop.js';
         
         const csop = new CSOP();
         await csop.init();
@@ -39,7 +39,7 @@ CSOP (Client-Side Orchestration Protocol) est un protocole qui transforme le nav
     </script>
 </head>
 <body>
-    <h1>CSOP v0.1.0 Fonctionne !</h1>
+    <h1>CSOP v0.2.0 Fonctionne !</h1>
 </body>
 </html>
 ```
@@ -62,7 +62,7 @@ cd csop
 ### 1️⃣ Sauvegarder des Données
 
 ```javascript
-import { CSOP } from 'https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.1.0/src/csop.js';
+import { CSOP } from 'https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.2.0/src/csop.js';
 
 const csop = new CSOP();
 await csop.init();
@@ -238,7 +238,7 @@ CSOP Core (csop.js)
 
 ## 📊 Avantages vs Architecture Classique
 
-| Feature | Architecture Classique | CSOP v0.1.0 |
+| Feature | Architecture Classique | CSOP v0.2.0 |
 |---------|----------------------|-------------|
 | **Backend requis** | Node.js/Python/Go | ❌ Aucun |
 | **Coût infra** | $50-500/mois | ✅ $0/mois |
@@ -249,7 +249,7 @@ CSOP Core (csop.js)
 
 ---
 
-## 🚧 Limitations v0.1.0 (Alpha)
+## 🚧 Limitations v0.2.0 (Alpha)
 
 - ⚠️ **Pas de streaming** : Fichiers > 100MB peuvent bloquer
 - ⚠️ **Pas de versioning** : Pas d'historique des modifications
@@ -324,4 +324,4 @@ Architecture inspirée du Model Context Protocol (MCP) d'Anthropic
 
 ---
 
-**CSOP v0.1.0** - The Future of Client-Side Architecture 🚀
+**CSOP v0.2.0** - The Future of Client-Side Architecture 🚀

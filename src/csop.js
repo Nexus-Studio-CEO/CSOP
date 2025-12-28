@@ -9,13 +9,16 @@ import { StorageCapability } from './capabilities/storage.js';
 import { ComputeCapability } from './capabilities/compute.js';
 import { SyncCapability } from './capabilities/sync.js';
 import { generateId, delay } from './utils.js';
+import { validatePayload, ValidationError } from './validation.js';
+import { CSOPError, ErrorCodes, createErrorResponse } from './errors.js';
+
 
 /**
  * Main CSOP Class - Protocol Router
  */
 export class CSOP {
     constructor() {
-        this.version = '0.1.0';
+        this.version = '0.2.0';
         this.capabilities = new Map();
         this.pending = new Map();
         this.initialized = false;

@@ -1,6 +1,6 @@
 {
   "name": "@nexusstudio/csop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Client-Side Orchestration Protocol - Revolutionary browser-based architecture for storage, compute, and sync",
   "type": "module",
   "main": "src/csop.js",
