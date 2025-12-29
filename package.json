@@ -1,38 +1,37 @@
 {
   "name": "@nexusstudio/csop",
   "version": "0.2.0",
-  "description": "Client-Side Orchestration Protocol - Revolutionary browser-based architecture for storage, compute, and sync",
+  "description": "Client-Side Orchestration Protocol - Enterprise-grade browser capabilities",
   "type": "module",
   "main": "src/csop.js",
   "exports": {
     ".": "./src/csop.js",
+    "./validation": "./src/validation.js",
+    "./errors": "./src/errors.js",
     "./storage": "./src/capabilities/storage.js",
     "./compute": "./src/capabilities/compute.js",
-    "./sync": "./src/capabilities/sync.js",
-    "./utils": "./src/utils.js"
+    "./sync": "./src/capabilities/sync.js"
+  },
+  "scripts": {
+    "test": "node test/runner.js",
+    "test:verbose": "node test/runner.js --verbose",
+    "prepublishOnly": "npm test"
   },
   "files": [
     "src/",
+    "test/",
     "README.md",
     "LICENSE"
   ],
-  "scripts": {
-    "demo": "npx http-server -p 8080 -o demo.html",
-    "test": "echo \"Tests coming in v0.2.0\" && exit 0"
-  },
   "keywords": [
     "client-side",
     "orchestration",
-    "protocol",
     "indexeddb",
     "web-workers",
     "realtime",
-    "sync",
-    "storage",
-    "compute",
     "browser",
-    "serverless",
-    "edge-computing"
+    "offline-first",
+    "performance"
   ],
   "author": {
     "name": "DAOUDA Abdoul Anzize",
@@ -42,20 +41,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nexus-Studio-CEO/csop.git"
+    "url": "https://github.com/Nexus-Studio-CEO/CSOP.git"
   },
-  "bugs": {
-    "url": "https://github.com/Nexus-Studio-CEO/csop/issues"
-  },
-  "homepage": "https://github.com/Nexus-Studio-CEO/csop#readme",
+  "bugs": "https://github.com/Nexus-Studio-CEO/CSOP/issues",
+  "homepage": "https://github.com/Nexus-Studio-CEO/CSOP",
   "engines": {
-    "node": ">=16.0.0"
-  },
-  "devDependencies": {},
-  "peerDependencies": {},
-  "cdn": "https://cdn.jsdelivr.net/gh/Nexus-Studio-CEO/csop@v0.1.0/src/csop.js",
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/sponsors/Nexus-Studio-CEO"
+    "node": ">=14.0.0"
   }
 }

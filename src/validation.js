@@ -1,52 +1,42 @@
 /**
- * CSOP Input Validation Layer
- * Version: 0.2.0
- * Author: DAOUDA Abdoul Anzize - Nexus Studio
+ * CSOP Validation Layer
+ * Input validation and sanitization
  */
 
-export const ValidationSchemas = {
-    'storage.save': {
-        key: { type: 'string', required: true, maxLength: 200 },
-        data: { type: 'any', required: true }
-    },
-    'storage.get': {
-        key: { type: 'string', required: true }
-    },
-    'compute.execute': {
-        task: { type: 'string', required: true },
-        data: { type: 'object', required: true }
+export class CSPValidator {
+  static validateCapability(name) {
+    if (typeof name !== 'string') {
+      throw new Error('CAPABILITY_NAME_INVALID: Must be string');
     }
-};
+    if (!/^[a-z_][a-z0-9_]*$/i.test(name)) {
+      throw new Error('CAPABILITY_NAME_INVALID: Invalid format');
+    }
+    return name;
+  }
 
-export function validatePayload(action, payload) {
-    const schema = ValidationSchemas[action];
-    if (!schema) {
-        throw new ValidationError(`Unknown action: ${action}`);
+  static validateStorageKey(key) {
+    if (typeof key !== 'string') {
+      throw new Error('STORAGE_KEY_INVALID: Must be string');
     }
-    
-    for (const [field, rules] of Object.entries(schema)) {
-        const value = payload[field];
-        if (rules.required && value === undefined) {
-            throw new ValidationError(`Missing required field: ${field}`);
-        }
-        if (value !== undefined && !isValidType(value, rules.type)) {
-            throw new ValidationError(`Invalid type for ${field}`);
-        }
+    if (key.length === 0 || key.length > 255) {
+      throw new Error('STORAGE_KEY_INVALID: Length must be 1-255');
     }
-}
+    return key;
+  }
 
-function isValidType(value, type) {
-    if (type === 'any') return true;
-    if (type === 'string') return typeof value === 'string';
-    if (type === 'number') return typeof value === 'number';
-    if (type === 'object') return typeof value === 'object' && value !== null;
-    return false;
-}
-
-export class ValidationError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'ValidationError';
-        this.code = 'VALIDATION_ERROR';
+  static validateStorageValue(value) {
+    try {
+      JSON.stringify(value);
+      return value;
+    } catch (e) {
+      throw new Error('STORAGE_VALUE_INVALID: Must be JSON serializable');
     }
+  }
+
+  static validateConfig(config) {
+    if (typeof config !== 'object' || config === null) {
+      throw new Error('CONFIG_INVALID: Must be object');
+    }
+    return config;
+  }
 }

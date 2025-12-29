@@ -1,0 +1,8 @@
+.github/
+.git/
+*.log
+*.tmp
+.DS_Store
+.colab/
+*.pyc
+__pycache__/
