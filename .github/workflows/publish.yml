@@ -1,0 +1,56 @@
+name: CSOP CI/CD
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  test-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        registry-url: 'https://registry.npmjs.org'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Run tests
+      run: npm test
+    
+    - name: Get version from tag
+      id: version
+      run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+    
+    - name: Update package version
+      run: |
+        VERSION=${{ steps.version.outputs.VERSION }}
+        npm version ${VERSION} --no-git-tag-version
+    
+    - name: Publish to NPM
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: CSOP ${{ steps.version.outputs.VERSION }}
+        body: |
+          🚀 Automated release from GitHub Actions
+          
+          📦 NPM: npm install @nexusstudio/csop@${{ steps.version.outputs.VERSION }}
+          🌐 CDN: https://unpkg.com/@nexusstudio/csop@${{ steps.version.outputs.VERSION }}
+        draft: false
+        prerelease: false
